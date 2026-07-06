@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SalesRef {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  name      String
+  email     String?
+  phone     String?
+  target    Int       @default(50)
+  isActive  Boolean   @default(true)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  registrations Registration[]
+  commissions  Commission[]
+  activities   ActivityLog[]
+}
+
+model Registration {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String    @unique
+  country       String
+  promoCode     String    @unique
+  trafficSource String
+  channelDesc   String?
+  refCode       String?
+  salesRefId    String?
+  status        String    @default("new")
+  notes         String?
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  salesRef    SalesRef?      @relation(fields: [salesRefId], references: [id])
+  commissions Commission[]
+}
+
+model Commission {
+  id             String    @id @default(cuid())
+  salesRefId     String
+  registrationId String
+  amount         Float     @default(0)
+  currency       String    @default("USD")
+  status         String    @default("pending")
+  month          String
+  paidAt         DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  salesRef      SalesRef      @relation(fields: [salesRefId], references: [id])
+  registration  Registration  @relation(fields: [registrationId], references: [id])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  action     String
+  details    String?
+  salesRefId String?
+  adminId    String?  // ID of the admin user who performed the action
+  adminName  String?  // Username of the admin (denormalized for display)
+  adminUserId String? // userId of the admin (denormalized for display)
+  ipAddress  String?  // IP address from which the action was performed
+  createdAt  DateTime @default(now())
+
+  salesRef SalesRef? @relation(fields: [salesRefId], references: [id])
+}
+
+model Admin {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  username    String    @unique
+  accessCode  String
+  allowedIPs  String    @default("*")
+  isActive    Boolean   @default(true)
+  role        String    @default("admin")
+  lastLoginAt DateTime?
+  lastLoginIP String?
+  createdAt   DateTime  @default(now())
+}
+
+model IPWhitelist {
+  id          String   @id @default(cuid())
+  ip          String   @unique
+  label       String?
+  addedBy     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String?
+  ip        String
+  success   Boolean
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // e.g. "user_create", "setting_update", "registration_delete"
+  targetType  String?  // e.g. "admin", "registration", "commission", "ip_whitelist", "setting"
+  targetId    String?  // ID of the affected record
+  targetName  String?  // Human-readable name of the affected record
+  oldValue    String?  // Previous value (JSON string for complex data)
+  newValue    String?  // New value (JSON string for complex data)
+  adminId     String?  // ID of the admin who made the change
+  adminName   String?  // Username of the admin
+  adminUserId String?  // userId of the admin
+  ipAddress   String?  // IP from which the change was made
+  details     String?  // Free-text description of the change
+  createdAt   DateTime @default(now())
+}

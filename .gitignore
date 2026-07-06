@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Cache
+.cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.db-journal
+db/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
+
+# Uploads & Downloads
+upload/
+download/
+
+# Skills & Tools
+skills/
+tool-results/
+agent-ctx/
+examples/
+
+# Misc
+*.pem
+coverage/
+test/
+prompt
+local-*
+.claude
+.z-ai-config
+bun.lock
