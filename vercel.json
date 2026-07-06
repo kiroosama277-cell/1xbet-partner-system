@@ -1,6 +1,4 @@
 {
   "framework": "nextjs",
-  "buildCommand": "prisma migrate deploy && next build",
-  "installCommand": "npm install",
   "regions": ["iad1"]
 }
